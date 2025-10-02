@@ -1,6 +1,6 @@
 
 /*
- * *** YOUR NAME GOES HERE / YOUR SECTION NUMBER ***
+ * *** BEATRIZ SANTOS / 002 ***
  *
  * This java file is a Java object implementing simple AVL Tree.
  * You are to complete the deleteElement method.
@@ -8,6 +8,7 @@
  */
 
 import java.lang.Math;
+import java.util.Objects;
 
 
 /**
@@ -343,24 +344,55 @@ class LUC_AVLTree {
 
     private Node deleteElement(int value, Node node) {
 
-        /*
-         * ADD CODE HERE
-         * 
-         * NOTE, that you should use the existing coded private methods
-         * in this file, which include:
-         *      - minValueNode,
-         *      - getMaxHeight,
-         *      - getHeight,
-         *      - getBalanceFactor,
-         *      - LLRotation
-         *      - RRRotation,
-         *      - LRRotation,
-         *      - RLRotation.
-         *
-         * To understand what each of these methods do, see the method prologues and
-         * code for each. You can also look at the method InsertElement, as it has do
-         * do many of the same things as this method.
-         */
+        // Base Case:
+        if (node == null){
+            return null;
+        }
+
+        // Search for the Node to Delete:
+        if (value < node.value){
+            node.leftChild = deleteElement(value, node.leftChild);
+        } else if (value > node.value){
+            node.rightChild = deleteElement(value, node.rightChild);
+        } else {
+            // now we found our node so:
+            if (node.leftChild == null && node.rightChild == null){
+                // CASE 1: LEAF
+                return null;
+            } else if (node.rightChild == null) {
+                // CASE 2: INTERIOR LEFT SUBTREE
+                return node.leftChild;
+            } else if (node.leftChild == null){
+                // CASE 3: INTERIOR RIGHT SUBTREE
+                return  node.rightChild;
+            } else {
+                // CASE 4: BOTH CHILDREN
+                Node successor = minValueNode(node.rightChild);
+                node.value = successor.value;
+                node.rightChild = deleteElement(successor.value, node.rightChild);
+            }
+        }
+
+        // update height
+        node.height = (getMaxHeight( getHeight(node.leftChild), getHeight(node.rightChild))) + 1;
+
+        // check balance and rotate as needed
+        int bf = getBalanceFactor(node);
+
+        // imbalance greater than 1: positive means left
+        if (bf > 1){
+            if (getBalanceFactor(node.leftChild) >= 0){
+                node = LLRotation(node);
+            } else {
+                node = LRRotation(node);
+            }
+        } else if (bf < -1){
+            if (getBalanceFactor(node.rightChild) >= 0){
+                node = RLRotation(node);
+            } else {
+                node = RRRotation(node);
+            }
+        }
 
         return node;
     }
@@ -559,3 +591,5 @@ class LUC_AVLTree {
         return z;
     }
 }
+
+
